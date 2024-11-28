@@ -47,9 +47,25 @@ class CategoryListAPIView(ListAPIView):
     serializer_class = CategorySerializer
     permission_classes = [IsAdminUser]
 
+# class CategoryDeleteAPIView(DestroyAPIView):
+#     permission_classes = [IsAdminUser]
+#     model = Category
+
+#     def delete(self, request, pk):
+#         category = get_object_or_404(Category, id=pk)
+#         self.check_object_permissions(self.request, category)
+#         self.perform_destroy(category)
+#         response_data = {
+#             "status": "OK",
+#             "serverTime": int(timezone.now().timestamp()),
+#             'message': 'Category deleted successfully.'
+#         }
+#         return Response(response_data)
+
 class CategoryDeleteAPIView(DestroyAPIView):
     permission_classes = [IsAdminUser]
-    model = Category
+    queryset = Category.objects.all()  # Добавьте этот атрибут для корректной работы
+    serializer_class = None  # Если сериализатор не нужен для удаления
 
     def delete(self, request, pk):
         category = get_object_or_404(Category, id=pk)
@@ -58,7 +74,7 @@ class CategoryDeleteAPIView(DestroyAPIView):
         response_data = {
             "status": "OK",
             "serverTime": int(timezone.now().timestamp()),
-            'message': 'Category deleted successfully.'
+            "message": "Category deleted successfully.",
         }
         return Response(response_data)
 
@@ -73,15 +89,55 @@ class CategoryUpdateAPIView(UpdateAPIView):
 
 ###
 
+
+
+# class UserCreateAPIView(CreateAPIView):
+#     serializer_class = UserCreateSerializer
+#     parser_classes = [MultiPartParser, FormParser]
+
+#     def create(self, request, *args, **kwargs):
+#         serializer = self.get_serializer(data=request.data)
+#         serializer.is_valid(raise_exception=True)
+#         user = serializer.save()
+#         return Response(
+#             {
+#                 "status": "OK",
+#                 "user": serializer.data,
+#             },
+#             status=status.HTTP_201_CREATED,
+#         )
+
+#     # Добавляем get_queryset для предотвращения ошибок в Swagger
+#     def get_queryset(self):
+#         return User.objects.none()  # Возвращает пустой QuerySet
+
+
+
 class UserCreateAPIView(CreateAPIView):
     serializer_class = UserCreateSerializer
     parser_classes = [MultiPartParser, FormParser]
+    permission_classes = [AllowAny]   
+
+    def get_queryset(self):
+        # Возвращаем пустой QuerySet, чтобы избежать ошибок
+        return User.objects.none()
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
-        return Response({"status": "OK", "user": serializer.data}, status=status.HTTP_201_CREATED)
+        response_data = {
+            "status": "OK",
+            "user": {
+                "id": user.id,
+                "name": user.name,
+                "email": user.email,
+                "image": user.image.url if user.image else None,
+                "createdAt": user.createdAt.strftime('%Y-%m-%d %H:%M:%S'),
+                "updatedAt": user.updatedAt.strftime('%Y-%m-%d %H:%M:%S'),
+            }
+        }
+        return Response(response_data, status=status.HTTP_201_CREATED)
 
 
 class UserDetailAPIView(RetrieveAPIView):

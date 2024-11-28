@@ -48,16 +48,20 @@ class UserCreateSerializer(serializers.ModelSerializer):
         return user
 
 
+
+
+
+
 class UserDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'name', 'email', 'image', 'createdAt', 'updatedAt', '__v']
+        fields = ['id', 'name', 'email', 'image', 'createdAt', 'updatedAt']
 
 
 class UserListSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'name', 'email', 'image', 'createdAt', 'updatedAt', '__v']
+        fields = ['id', 'name', 'email', 'image', 'createdAt', 'updatedAt']
 
 
 class UserUpdateSerializer(serializers.ModelSerializer):

@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 
 class Category(models.Model):
    
@@ -44,6 +44,7 @@ class User(AbstractBaseUser):
     updatedAt = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
+    version = models.PositiveIntegerField(default=0)
 
     objects = UserManager()
 
@@ -52,3 +53,6 @@ class User(AbstractBaseUser):
 
     def __str__(self):
         return self.email
+
+
+
